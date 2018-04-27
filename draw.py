@@ -27,13 +27,13 @@ def scanline_convert(poly, screen, zbuffer, color):
     xend = bot[0]
     zstart = bot[2]
     zend = bot[2]
-    if (top[1] != bot[1]): #sets dx and dz for edge from bot to top
-        b_to_tdx = (top[0] - bot[0]) / (top[1] - bot[1])
-        b_to_tdz = (top[2] - bot[2]) / (top[1] - bot[1])
+    if (int(top[1]) != int(bot[1])): #sets dx and dz for edge from bot to top
+        b_to_tdx = float(top[0] - bot[0]) / (top[1] - bot[1])
+        b_to_tdz = float(top[2] - bot[2]) / (top[1] - bot[1])
     
     if (mid[1] != bot[1]): #sets dx and dz for edge from bot to mid
-        b_to_mdx = (mid[0] - bot[0]) / (mid[1] - bot[1])
-        b_to_mdz = (mid[2] - bot[2]) / (mid[1] - bot[1])
+        b_to_mdx = float(mid[0] - bot[0]) / (mid[1] - bot[1])
+        b_to_mdz = float(mid[2] - bot[2]) / (mid[1] - bot[1])
         
         for y in range(int(bot[1]), int(mid[1]) + 1): #from bot to mid
             xstart += b_to_tdx
@@ -45,9 +45,9 @@ def scanline_convert(poly, screen, zbuffer, color):
         xend = mid[0]
         zend = mid[2]
             
-    if (top[1] != mid[1]): #sets dx and dz for edge from mid to top
-        m_to_tdx = (top[0] - mid[0]) / (top[1] - mid[1])
-        m_to_tdz = (top[2] - mid[2]) / (top[1] - mid[1])
+    if (int(top[1]) != int(mid[1])): #if mid and top are distinct
+        m_to_tdx = float(top[0] - mid[0]) / (top[1] - mid[1])#sets dx and dz for edge from mid to top
+        m_to_tdz = float(top[2] - mid[2]) / (top[1] - mid[1])
         
         for y in range(int(mid[1]), int(top[1]) + 1): #from mid to top
             xstart += b_to_tdx
@@ -77,7 +77,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
             
             scanline_convert(matrix[point:point+3], screen, zbuffer, pcolor)
             
-            '''
+            
             draw_line( int(matrix[point][0]),
                        int(matrix[point][1]),
                        matrix[point][2],
@@ -98,7 +98,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
                        int(matrix[point+2][0]),
                        int(matrix[point+2][1]),
                        matrix[point+2][2],
-                       screen, zbuffer, color)'''
+                       screen, zbuffer, color)
         point+= 3
 
 
@@ -358,7 +358,7 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
 
     z = z0
     while ( loop_start < loop_end ):
-        plot( screen, zbuffer, color, x, y, 0 ) #replace 0 with z value
+        plot( screen, zbuffer, color, x, y, z )
         if ( (wide and ((A > 0 and d > 0) or (A < 0 and d < 0))) or
              (tall and ((A > 0 and d < 0) or (A < 0 and d > 0 )))):
 
@@ -370,5 +370,5 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             y+= dy_east
             d+= d_east
         loop_start+= 1
-        z -= dz
-    plot( screen, zbuffer, color, x, y, z )
+        z += dz
+    plot( screen, zbuffer, color, x1, y1, z1 )
