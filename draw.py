@@ -27,20 +27,21 @@ def scanline_convert(poly, screen, zbuffer, color):
     xend = bot[0]
     zstart = bot[2]
     zend = bot[2]
-    if (int(top[1]) != int(bot[1])): #sets dx and dz for edge from bot to top
-        b_to_tdx = float(top[0] - bot[0]) / (top[1] - bot[1])
-        b_to_tdz = float(top[2] - bot[2]) / (top[1] - bot[1])
+    
+    #sets dx and dz for edge from bot to top
+    b_to_tdx = (top[0] - bot[0]) / (top[1] - bot[1])
+    b_to_tdz = (top[2] - bot[2]) / (top[1] - bot[1])
     
     if (mid[1] != bot[1]): #sets dx and dz for edge from bot to mid
         b_to_mdx = float(mid[0] - bot[0]) / (mid[1] - bot[1])
         b_to_mdz = float(mid[2] - bot[2]) / (mid[1] - bot[1])
         
-        for y in range(int(bot[1]), int(mid[1]) + 1): #from bot to mid
+        for y in range(int(bot[1]), int(mid[1])): #from bot to mid
+            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
             xstart += b_to_tdx
             xend   += b_to_mdx
             zstart += b_to_tdz
             zend   += b_to_mdz
-            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
     else:
         xend = mid[0]
         zend = mid[2]
@@ -49,12 +50,12 @@ def scanline_convert(poly, screen, zbuffer, color):
         m_to_tdx = float(top[0] - mid[0]) / (top[1] - mid[1])#sets dx and dz for edge from mid to top
         m_to_tdz = float(top[2] - mid[2]) / (top[1] - mid[1])
         
-        for y in range(int(mid[1]), int(top[1]) + 1): #from mid to top
+        for y in range(int(mid[1]), int(top[1])): #from mid to top
+            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
             xstart += b_to_tdx
             xend   += m_to_tdx
             zstart += b_to_tdz
             zend   += m_to_tdz
-            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
         
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0);
@@ -77,7 +78,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
             
             scanline_convert(matrix[point:point+3], screen, zbuffer, pcolor)
             
-            
+            '''
             draw_line( int(matrix[point][0]),
                        int(matrix[point][1]),
                        matrix[point][2],
@@ -99,6 +100,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
                        int(matrix[point+2][1]),
                        matrix[point+2][2],
                        screen, zbuffer, color)
+            '''
         point+= 3
 
 
@@ -352,7 +354,6 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
 
     if loop_end != loop_start:
         dz = float(z1 - z0)/(loop_end - loop_start)
-        print dz
     else:
         dz = 0
 
