@@ -1,17 +1,3 @@
-#test box mesh
-push
-move
-150 200 0
-rotate
-x 20
-rotate
-y 20
-box
-0 0 0 200 100 400
-display
-#clear the screen, test sphere
-clear
-pop
 sphere
 0 0 0 200
 display

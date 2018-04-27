@@ -17,30 +17,44 @@ def scanline_convert(poly, screen, zbuffer, color):
     if int(mid[0]) == int(bot[0]) and int(mid[1]) == int(bot[1]):
         return
     
-    b_to_tdx = 0
+    b_to_dtx = 0
     b_to_mdx = 0
     m_to_tdx = 0
-    xstart = bot[0]#makes flooring the same as rounding
+    b_to_tdz = 0
+    b_to_mdz = 0
+    m_to_tdz = 0
+    xstart = bot[0]
     xend = bot[0]
-
-    if (top[1] != bot[1]):
+    zstart = bot[2]
+    zend = bot[2]
+    if (top[1] != bot[1]): #sets dx and dz for edge from bot to top
         b_to_tdx = (top[0] - bot[0]) / (top[1] - bot[1])
+        b_to_tdz = (top[2] - bot[2]) / (top[1] - bot[1])
     
-    if (mid[1] != bot[1]):
+    if (mid[1] != bot[1]): #sets dx and dz for edge from bot to mid
         b_to_mdx = (mid[0] - bot[0]) / (mid[1] - bot[1])
+        b_to_mdz = (mid[2] - bot[2]) / (mid[1] - bot[1])
+        
         for y in range(int(bot[1]), int(mid[1]) + 1): #from bot to mid
             xstart += b_to_tdx
             xend   += b_to_mdx
-            draw_line( int(xstart), y, 0, int(xend), y, 0, screen, zbuffer, color)
+            zstart += b_to_tdz
+            zend   += b_to_mdz
+            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
     else:
         xend = mid[0]
+        zend = mid[2]
             
-    if (top[1] != mid[1]):
-        m_to_tdx  =(top[0] - mid[0]) / (top[1] - mid[1])
+    if (top[1] != mid[1]): #sets dx and dz for edge from mid to top
+        m_to_tdx = (top[0] - mid[0]) / (top[1] - mid[1])
+        m_to_tdz = (top[2] - mid[2]) / (top[1] - mid[1])
+        
         for y in range(int(mid[1]), int(top[1]) + 1): #from mid to top
             xstart += b_to_tdx
             xend   += m_to_tdx
-            draw_line( int(xstart), y, 0, int(xend), y, 0, screen, zbuffer, color)
+            zstart += b_to_tdz
+            zend   += m_to_tdz
+            draw_line( int(xstart), y, int(zstart), int(xend), y, int(zend), screen, zbuffer, color)
         
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0);
@@ -62,7 +76,8 @@ def draw_polygons( matrix, screen, zbuffer, color ):
             pcolor = [(i * 57 % 256), (i * 91 % 256), (i * 133 % 256)]
             
             scanline_convert(matrix[point:point+3], screen, zbuffer, pcolor)
-
+            
+            '''
             draw_line( int(matrix[point][0]),
                        int(matrix[point][1]),
                        matrix[point][2],
@@ -83,7 +98,7 @@ def draw_polygons( matrix, screen, zbuffer, color ):
                        int(matrix[point+2][0]),
                        int(matrix[point+2][1]),
                        matrix[point+2][2],
-                       screen, zbuffer, color)
+                       screen, zbuffer, color)'''
         point+= 3
 
 
@@ -95,18 +110,15 @@ def add_box( polygons, x, y, z, width, height, depth ):
     #front
     add_polygon(polygons, x, y, z, x1, y1, z, x1, y, z);
     add_polygon(polygons, x, y, z, x, y1, z, x1, y1, z);
-
     #back
     add_polygon(polygons, x1, y, z1, x, y1, z1, x, y, z1);
     add_polygon(polygons, x1, y, z1, x1, y1, z1, x, y1, z1);
-
     #right side
     add_polygon(polygons, x1, y, z, x1, y1, z1, x1, y, z1);
     add_polygon(polygons, x1, y, z, x1, y1, z, x1, y1, z1);
     #left side
     add_polygon(polygons, x, y, z1, x, y1, z, x, y, z);
     add_polygon(polygons, x, y, z1, x, y1, z1, x, y1, z);
-
     #top
     add_polygon(polygons, x, y, z1, x1, y, z, x1, y, z1);
     add_polygon(polygons, x, y, z1, x, y, z, x1, y, z);
@@ -338,6 +350,13 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             loop_start = y1
             loop_end = y
 
+    if loop_end != loop_start:
+        dz = float(z1 - z0)/(loop_end - loop_start)
+        print dz
+    else:
+        dz = 0
+
+    z = z0
     while ( loop_start < loop_end ):
         plot( screen, zbuffer, color, x, y, 0 ) #replace 0 with z value
         if ( (wide and ((A > 0 and d > 0) or (A < 0 and d < 0))) or
@@ -351,4 +370,5 @@ def draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ):
             y+= dy_east
             d+= d_east
         loop_start+= 1
-    plot( screen, zbuffer, color, x, y, 0 ) #repalce 0 with z value
+        z -= dz
+    plot( screen, zbuffer, color, x, y, z )
