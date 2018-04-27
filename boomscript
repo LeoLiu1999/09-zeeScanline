@@ -1,0 +1,60 @@
+#cannon
+push
+rotate
+y 230
+rotate
+x 90
+rotate
+z 345
+move
+-250 -100 -200
+box
+0 0 0 200 50 50
+push
+move
+0 25 0
+torus
+0 0 0 35 5
+pop
+push
+move
+0 -75 0
+torus
+0 0 0 35 5
+pop
+pop
+#cannonballs
+push
+rotate
+x 20
+rotate
+y 10
+move
+300 100 50
+#bottom layer
+sphere
+0 0 0 50
+sphere
+100 0 0 50
+sphere
+200 0 0 50
+sphere
+50 0 87 50
+sphere
+150 0 87 50
+sphere
+100 0 174 50
+#middle layer
+sphere
+50 47 29 50
+sphere
+150 47 29 50
+sphere
+100 47 115 50
+#and the top
+sphere
+100 94 58 50
+ident
+display
+save
+stackOfBalls.png

@@ -4,6 +4,10 @@ from math import *
 from gmath import *
 
 def scanline_convert(poly, screen, zbuffer, color):
+    '''
+    Hey Mr. DW, there's still things wrong about this code
+    look at the tori triangles in scanline_test, some are messed up
+    '''
     poly.sort(key=lambda x:x[1])
     top = poly[2]
     mid = poly[1]
